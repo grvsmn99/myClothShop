@@ -7,10 +7,7 @@ import com.gaurav.learning.myClothShop.productService.models.ProductResponse;
 import com.gaurav.learning.myClothShop.productService.repository.ProductRepository;
 import com.gaurav.learning.myClothShop.productService.services.ProductService;
 import com.gaurav.learning.myClothShop.productService.utils.ProductUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +19,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProductServiceImpl implements ProductService {
 
-    private Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
-
     @Autowired
     private ProductRepository repository;
 
@@ -32,18 +27,19 @@ public class ProductServiceImpl implements ProductService {
         Product product = ProductUtil.mapProductRequestToProduct(productRequest);
 
         product.setId(UUID.randomUUID().toString());
-        logger.info("product = "+product.toString());
+        log.debug("product = "+product);
         Product productResponse = repository.save(product);
-        logger.info("productResponse = "+productResponse.toString());
+        log.info("Product add successfully...");
+        log.debug("productResponse = "+productResponse);
         return ProductUtil.mapProductToProductResponse(productResponse);
     }
 
     @Override
     public ProductResponse getProduct(String id) {
-        logger.info("User Id = "+id);
+        log.debug("User Id = "+id);
         Product response = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product Not Found with id:"+id));
-        logger.info("product fetch = "+response.toString());
+        log.info("product fetched = "+response.toString());
         return ProductUtil.mapProductToProductResponse(response);
     }
 
@@ -51,8 +47,9 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getProducts() {
         List<ProductResponse> response = repository.findAll()
                 .stream()
-                .map(product -> ProductUtil.mapProductToProductResponse(product))
+                .map(ProductUtil::mapProductToProductResponse)
                 .collect(Collectors.toList());
+        log.info("List of products fetched successfully");
         return response;
     }
 }
